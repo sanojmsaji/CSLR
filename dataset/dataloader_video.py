@@ -17,7 +17,6 @@ import numpy as np
 from PIL import Image
 import torch.utils.data as data
 import matplotlib.pyplot as plt
-from utils import video_augmentation
 from torch.utils.data.sampler import Sampler
 
 sys.path.append("..")
@@ -56,7 +55,12 @@ class BaseFeeder(data.Dataset):
         return [cv2.cvtColor(cv2.imread(img_path), cv2.COLOR_BGR2RGB) for img_path in img_list], label_list, fi
 
     def normalize(self, video, label, file_id=None):
-        video = video.float() / 127.5 - 1
+        if isinstance(video, list):
+          video = np.array(video)
+          video = torch.from_numpy(video.transpose((0, 3, 1, 2))).float()
+        if isinstance(video, np.ndarray):
+          video = torch.from_numpy(video.transpose((0, 3, 1, 2)))        
+          video = video.float() / 127.5 - 1
         return video, label
 
     def byte_to_img(self, byteflow):

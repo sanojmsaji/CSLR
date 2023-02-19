@@ -23,9 +23,6 @@ class BiLSTMLayer(nn.Module):
             num_layers=self.num_layers,
             dropout=self.dropout,
             bidirectional=self.bidirectional)
-        # for name, param in self.rnn.named_parameters():
-        #     if name[:6] == 'weight':
-        #         nn.init.orthogonal_(param)
 
     def forward(self, src_feats, src_lens, hidden=None):
         """

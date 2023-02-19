@@ -22,6 +22,7 @@ from seq_scripts import seq_train, seq_eval
 class Processor():
     def __init__(self, arg):
         self.arg = arg
+        self.save_arg()
         self.device = utils.GpuDataParallel()
         self.dataset = {}
         self.data_loader = {}
@@ -34,22 +35,32 @@ class Processor():
             seq_model_list = []
             for epoch in range(self.arg.optimizer_args['start_epoch'], self.arg.num_epoch):
                 # train end2end model
+                save_model = epoch % self.arg.save_interval == 0
                 seq_train(self.data_loader['train'], self.model, self.optimizer,
-                          self.device, epoch, self.recoder)
+                          self.device, epoch, self.arg.log_interval)
+                if save_model:
+                      model_path = "{}dev_{:05.2f}_epoch{}_model.pt".format(self.arg.work_dir, 101, epoch)
+                      seq_model_list.append(model_path)
+                      # print("seq_model_list", seq_model_list)
+                      self.save_model(epoch, model_path)
+
         elif self.arg.phase == 'test':
             if self.arg.load_weights is None and self.arg.load_checkpoints is None:
                 raise ValueError('Please appoint --load-weights.')
             # train_wer = seq_eval(self.arg, self.data_loader["train_eval"], self.model, self.device,
             #                      "train", 6667, self.arg.work_dir, self.recoder, self.arg.evaluate_tool)
             dev_wer = seq_eval(self.arg, self.data_loader["dev"], self.model, self.device,
-                               "dev", 6667, self.arg.work_dir, self.recoder, self.arg.evaluate_tool)
+                               "dev", 6667, self.arg.work_dir, self.arg.evaluate_tool)
             test_wer = seq_eval(self.arg, self.data_loader["test"], self.model, self.device,
-                                "test", 6667, self.arg.work_dir, self.recoder, self.arg.evaluate_tool)
+                                "test", 6667, self.arg.work_dir, self.arg.evaluate_tool)
 
     def save_arg(self):
         arg_dict = vars(self.arg)
         if not os.path.exists(self.arg.work_dir):
+            print("directory created")
             os.makedirs(self.arg.work_dir)
+        else:
+          print("directory not created")
         with open('{}/config.yaml'.format(self.arg.work_dir), 'w') as f:
             yaml.dump(arg_dict, f)
 
@@ -59,7 +70,6 @@ class Processor():
             'model_state_dict': self.model.state_dict(),
             'optimizer_state_dict': self.optimizer.state_dict(),
             'scheduler_state_dict': self.optimizer.scheduler.state_dict(),
-            'rng_state': self.rng.save_rng_state(),
         }, save_path)
 
     def loading(self):
@@ -113,10 +123,6 @@ class Processor():
     def load_checkpoint_weights(self, model, optimizer):
         self.load_model_weights(model, self.arg.load_checkpoints)
         state_dict = torch.load(self.arg.load_checkpoints)
-
-        if len(torch.cuda.get_rng_state_all()) == len(state_dict['rng_state']['cuda']):
-            print("Loading random seeds...")
-            self.rng.set_rng_state(state_dict['rng_state'])
         if "optimizer_state_dict" in state_dict.keys():
             print("Loading optimizer parameters...")
             optimizer.load_state_dict(state_dict["optimizer_state_dict"])
@@ -173,3 +179,4 @@ if __name__ == '__main__':
     processor = Processor(args)
 
     processor.start()
+    print("All finished")
