@@ -9,15 +9,6 @@ import torch.nn.functional as F
 import torchvision.models as models
 from modules import BiLSTMLayer, TemporalConv
 
-
-class Identity(nn.Module):
-    def __init__(self):
-        super(Identity, self).__init__()
-
-    def forward(self, x):
-        return x
-
-
 class SLRModel(nn.Module):
     def __init__(self, num_classes, c2d_type, conv_type, use_bn=False, tm_type='BiLSTM',
                  hidden_size=1024, gloss_dict=None, loss_weights=None):
@@ -28,7 +19,7 @@ class SLRModel(nn.Module):
         self.num_classes = num_classes
         self.loss_weights = loss_weights
         self.conv2d = getattr(models, c2d_type)(pretrained=True)
-        self.conv2d.fc = Identity()
+        self.conv2d.fc = nn.Identity()
         self.conv1d = TemporalConv(input_size=512,
                                    hidden_size=hidden_size,
                                    conv_type=conv_type,
