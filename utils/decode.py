@@ -7,7 +7,6 @@ import numpy as np
 from itertools import groupby
 import torch.nn.functional as F
 
-
 class Decode(object):
     def __init__(self, gloss_dict, num_classes, blank_id=0):
         self.i2g_dict = dict((v[0], k) for k, v in gloss_dict.items())
@@ -24,14 +23,7 @@ class Decode(object):
         return self.BeamSearch(nn_output, vid_lgt, probs)
 
     def BeamSearch(self, nn_output, vid_lgt, probs=False):
-        '''
-        CTCBeamDecoder Shape:
-                - Input:  nn_output (B, T, N), which should be passed through a softmax layer
-                - Output: beam_resuls (B, N_beams, T), int, need to be decoded by i2g_dict
-                          beam_scores (B, N_beams), p=1/np.exp(beam_score)
-                          timesteps (B, N_beams)
-                          out_lens (B, N_beams)
-        '''
+
         if not probs:
             nn_output = nn_output.softmax(-1).cpu()
         vid_lgt = vid_lgt.cpu()

@@ -11,13 +11,6 @@ class Optimizer(object):
         if self.optim_dict["optimizer"] == 'Adam':
             alpha = self.optim_dict['learning_ratio']
             self.optimizer = optim.Adam(
-                # [
-                #     {'params': model.conv2d.parameters(), 'lr': self.optim_dict['base_lr']*alpha},
-                #     {'params': model.conv1d.parameters(), 'lr': self.optim_dict['base_lr']*alpha},
-                #     {'params': model.rnn.parameters()},
-                #     {'params': model.classifier.parameters()},
-                # ],
-                # model.conv1d.fc.parameters(),
                 model.parameters(),
                 lr=self.optim_dict['base_lr'],
                 weight_decay=self.optim_dict['weight_decay']
