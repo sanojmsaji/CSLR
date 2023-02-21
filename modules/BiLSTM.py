@@ -4,10 +4,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class BiLSTMLayer(nn.Module):
+class BiLtxtLayer(nn.Module):
     def __init__(self, input_size, debug=False, hidden_size=512, num_layers=1, dropout=0.3,
-                 bidirectional=True, rnn_type='LSTM', num_classes=-1):
-        super(BiLSTMLayer, self).__init__()
+                 bidirectional=True, rnn_type='Ltxt', num_classes=-1):
+        super(BiLtxtLayer, self).__init__()
 
         self.dropout = dropout
         self.num_layers = num_layers
@@ -17,7 +17,7 @@ class BiLSTMLayer(nn.Module):
         self.hidden_size = int(hidden_size / self.num_directions)
         self.rnn_type = rnn_type
         self.debug = debug
-        self.rnn = nn.LSTM(
+        self.rnn = nn.Ltxt(
             input_size=self.input_size,
             hidden_size=self.hidden_size,
             num_layers=self.num_layers,
@@ -39,7 +39,7 @@ class BiLSTMLayer(nn.Module):
         # rnn(gru) returns:
         # - packed_outputs: shape same as packed_emb
         # - hidden: (num_layers * num_directions, batch_size, hidden_size)
-        if hidden is not None and self.rnn_type == 'LSTM':
+        if hidden is not None and self.rnn_type == 'Ltxt':
             half = int(hidden.size(0) / 2)
             hidden = (hidden[:half], hidden[half:])
         packed_outputs, hidden = self.rnn(packed_emb, hidden)
@@ -84,7 +84,7 @@ class BiLSTMLayer(nn.Module):
             return torch.cat([h[0:h.size(0):2], h[1:h.size(0):2]], 2)
 
         if isinstance(hidden, tuple):
-            # LSTM hidden contains a tuple (hidden state, cell state)
+            # Ltxt hidden contains a tuple (hidden state, cell state)
             hidden = tuple([_cat(h) for h in hidden])
         else:
             # GRU hidden

@@ -41,14 +41,11 @@ class Processor():
                 if save_model:
                       model_path = "{}dev_{:05.2f}_epoch{}_model.pt".format(self.arg.work_dir, 101, epoch)
                       seq_model_list.append(model_path)
-                      # print("seq_model_list", seq_model_list)
                       self.save_model(epoch, model_path)
 
         elif self.arg.phase == 'test':
             if self.arg.load_weights is None and self.arg.load_checkpoints is None:
                 raise ValueError('Please appoint --load-weights.')
-            # train_wer = seq_eval(self.arg, self.data_loader["train_eval"], self.model, self.device,
-            #                      "train", 6667, self.arg.work_dir, self.recoder, self.arg.evaluate_tool)
             dev_wer = seq_eval(self.arg, self.data_loader["dev"], self.model, self.device,
                                "dev", 6667, self.arg.work_dir, self.arg.evaluate_tool)
             test_wer = seq_eval(self.arg, self.data_loader["test"], self.model, self.device,
@@ -159,24 +156,16 @@ class Processor():
 if __name__ == '__main__':
     sparser = utils.get_parser()
     p = sparser.parse_args()
-    # p.config = "baseline_iter.yaml"
     if p.config is not None:
         with open(p.config, 'r') as f:
             try:
                 default_arg = yaml.load(f, Loader=yaml.FullLoader)
             except AttributeError:
                 default_arg = yaml.load(f)
-        
-    # NEW START
-    # import argparse
-    # sparser = argparse.ArgumentParser()
-    # NEW END
-
         sparser.set_defaults(**default_arg)
     args = sparser.parse_args()
     with open(f"./configs/{args.dataset}.yaml", 'r') as f:
         args.dataset_info = yaml.load(f, Loader=yaml.FullLoader)
     processor = Processor(args)
-
     processor.start()
     print("All finished")

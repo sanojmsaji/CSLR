@@ -7,10 +7,10 @@ import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.models as models
-from modules import BiLSTMLayer, TemporalConv
+from modules import BiLtxtLayer, TemporalConv
 
 class SLRModel(nn.Module):
-    def __init__(self, num_classes, c2d_type, conv_type, use_bn=False, tm_type='BiLSTM',
+    def __init__(self, num_classes, c2d_type, conv_type, use_bn=False, tm_type='BiLtxt',
                  hidden_size=1024, gloss_dict=None, loss_weights=None):
         super(SLRModel, self).__init__()
         self.decoder = None
@@ -26,7 +26,7 @@ class SLRModel(nn.Module):
                                    use_bn=use_bn,
                                    num_classes=num_classes)
         self.decoder = utils.Decode(gloss_dict, num_classes)
-        self.temporal_model = BiLSTMLayer(rnn_type='LSTM', input_size=hidden_size, hidden_size=hidden_size,
+        self.temporal_model = BiLtxtLayer(rnn_type='Ltxt', input_size=hidden_size, hidden_size=hidden_size,
                                               num_layers=2, bidirectional=True)
         self.classifier = nn.Linear(hidden_size, self.num_classes)
         self.register_backward_hook(self.backward_hook)

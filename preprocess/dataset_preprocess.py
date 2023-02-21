@@ -13,9 +13,6 @@ from multiprocessing import Pool
 
 def csv2dict(anno_path, dataset_type):
     inputs_list = pandas.read_csv(anno_path)
-    if dataset_type == 'train':
-        broken_data = [2390]
-        inputs_list.drop(broken_data, inplace=True)
     inputs_list = (inputs_list.to_dict()['id|folder|signer|annotation'].values())
     info_dict = dict()
     info_dict['prefix'] = anno_path.rsplit("/", 3)[0] + "/features/fullFrame-210x260px"
@@ -34,12 +31,12 @@ def csv2dict(anno_path, dataset_type):
     return info_dict
 
 
-def generate_gt_stm(info, save_path):
+def generate_gt_txt(info, save_path):
     with open(save_path, "w") as f:
         for k, v in info.items():
             if not isinstance(k, int):
                 continue
-            f.writelines(f"{v['fileid']} 1 {v['signer']} 0.0 1.79769e+308 {v['label']}\n")
+            f.writelines(f"{v['fileid']} {v['signer']} {v['label']}\n")
 
 
 def sign_dict_update(total_dict, info):
@@ -112,15 +109,14 @@ if __name__ == '__main__':
         information = csv2dict(f"{args.dataset_root}/{args.annotation_prefix.format(md)}", dataset_type=md)
         np.save(f"./{args.dataset}/{md}_info.npy", information)
         # update the total gloss dict
-        sign_dict_update(sign_dict, information)
-        # generate groudtruth stm for evaluation
-        generate_gt_stm(information, f"./{args.dataset}/{args.dataset}-groundtruth-{md}.stm")
+        sign_dict = sign_dict_update(sign_dict, information)
+        # generate groudtruth txt for evaluation
+        generate_gt_txt(information, f"./{args.dataset}/{args.dataset}-groundtruth-{md}.txt")
         # resize images
         video_index = np.arange(len(information) - 1)
         print(f"Resize image to {args.output_res}")
         if args.process_image:
-            if args.multip        
-rocessing:
+            if args.multiprocessing:
                 run_mp_cmd(10, partial(resize_dataset, dsize=args.output_res, info_dict=information), video_index)
             else:
                 for idx in tqdm(video_index):

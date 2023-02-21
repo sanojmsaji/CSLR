@@ -48,19 +48,18 @@ def seq_eval(cfg, loader, model, device, mode, epoch, work_dir,
         total_info += [file_name.split("|")[0] for file_name in data[-1]]
         total_sent += ret_dict['recognized_sents']
         total_conv_sent += ret_dict['conv_sents']
-    # COMMENT START
     try:
-        write2file(work_dir + "output-hypothesis-{}.ctm".format(mode), total_info, total_sent)
-        write2file(work_dir + "output-hypothesis-{}-conv.ctm".format(mode), total_info,
+        write2file(work_dir + "output-hypothesis-{}.txt".format(mode), total_info, total_sent)
+        write2file(work_dir + "output-hypothesis-{}-conv.txt".format(mode), total_info,
                    total_conv_sent)
     except:
         print("Unexpected error:", sys.exc_info()[0])
-        lstm_ret = 100.0
+        ltxt_ret = 100.0
     finally:
         pass
     # evaluate wer
-    lstm_ret = 0
-    return lstm_ret
+    ltxt_ret = 0
+    return ltxt_ret
 
 def write2file(path, info, output):
     filereader = open(path, "w")
