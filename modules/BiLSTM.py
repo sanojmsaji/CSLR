@@ -5,7 +5,7 @@ import torch.nn.functional as F
 
 class BiLSTMLayer(nn.Module):
     def __init__(self, input_size, debug=False, hidden_size=512, num_layers=1, dropout=0.3,
-                 bidirectional=True, rnn_type='Ltxt', num_classes=-1):
+                 bidirectional=True, rnn_type='LSTM', num_classes=-1):
         super(BiLtxtLayer, self).__init__()
 
         self.dropout = dropout
