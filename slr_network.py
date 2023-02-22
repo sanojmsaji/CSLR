@@ -7,10 +7,10 @@ import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.models as models
-from modules import BiLtxtLayer, TemporalConv
+from modules import BiLSTMLayer, TemporalConv
 
 class SLRModel(nn.Module):
-    def __init__(self, num_classes, c2d_type, conv_type, use_bn=False, tm_type='BiLtxt',
+    def __init__(self, num_classes, c2d_type, conv_type, use_bn=False, tm_type='BiLSTM',
                  hidden_size=1024, gloss_dict=None, loss_weights=None):
         super(SLRModel, self).__init__()
         self.decoder = None
