@@ -26,7 +26,7 @@ class SLRModel(nn.Module):
                                    use_bn=use_bn,
                                    num_classes=num_classes)
         self.decoder = utils.Decode(gloss_dict, num_classes)
-        self.temporal_model = BiLtxtLayer(rnn_type='Ltxt', input_size=hidden_size, hidden_size=hidden_size,
+        self.temporal_model = BiLSTMLayer(rnn_type='LSTM', input_size=hidden_size, hidden_size=hidden_size,
                                               num_layers=2, bidirectional=True)
         self.classifier = nn.Linear(hidden_size, self.num_classes)
         self.register_backward_hook(self.backward_hook)

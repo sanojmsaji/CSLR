@@ -23,7 +23,7 @@ class TemporalConv(nn.Module):
 
         modules = []
         for layer_idx, ks in enumerate(self.kernel_size):
-            input_sz = self.input_size if layer_idx == 0 else self.hidden_size
+            input_sz = self.input_size
             if ks[0] == 'P':
                 modules.append(nn.MaxPool1d(kernel_size=int(ks[1]), ceil_mode=False))
             elif ks[0] == 'K':
