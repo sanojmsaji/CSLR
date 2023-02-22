@@ -150,6 +150,7 @@ class Processor():
             shuffle=train_flag,
             drop_last=train_flag,
             num_workers=self.arg.num_worker,  # if train_flag else 0
+            collate_fn=self.feeder.collate_fn,
         )
 
 if __name__ == '__main__':
