@@ -46,7 +46,7 @@ class GpuDataParallel(object):
     def criterion_to_device(self, loss):
         return loss.to(self.output_device)
 
-        # allocate memory to each available gpu
+    # allocate memory to each available gpu
     def occupy_gpu(self, gpus=None):
         """
             make program appear on nvidia-smi.

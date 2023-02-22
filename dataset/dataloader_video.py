@@ -63,55 +63,6 @@ class BaseFeeder(data.Dataset):
           video = video.float() / 127.5 - 1
         return video, label
 
-    def byte_to_img(self, byteflow):
-        unpacked = pa.deserialize(byteflow)
-        imgbuf = unpacked[0]
-        buf = six.BytesIO()
-        buf.write(imgbuf)
-        buf.seek(0)
-        img = Image.open(buf).convert('RGB')
-        return img
-
-    @staticmethod
-    def collate_fn(batch):
-        batch = [item for item in sorted(batch, key=lambda x: len(x[0]), reverse=True)]
-        video, label, info = list(zip(*batch))
-        if len(video[0].shape) > 3:
-            max_len = len(video[0])
-            video_length = torch.LongTensor([np.ceil(len(vid) / 4.0) * 4 + 12 for vid in video])
-            left_pad = 6
-            right_pad = int(np.ceil(max_len / 4.0)) * 4 - max_len + 6
-            max_len = max_len + left_pad + right_pad
-            padded_video = [torch.cat(
-                (
-                    vid[0][None].expand(left_pad, -1, -1, -1),
-                    vid,
-                    vid[-1][None].expand(max_len - len(vid) - left_pad, -1, -1, -1),
-                )
-                , dim=0)
-                for vid in video]
-            padded_video = torch.stack(padded_video)
-        else:
-            max_len = len(video[0])
-            video_length = torch.LongTensor([len(vid) for vid in video])
-            padded_video = [torch.cat(
-                (
-                    vid,
-                    vid[-1][None].expand(max_len - len(vid), -1),
-                )
-                , dim=0)
-                for vid in video]
-            padded_video = torch.stack(padded_video).permute(0, 2, 1)
-        label_length = torch.LongTensor([len(lab) for lab in label])
-        if max(label_length) == 0:
-            return padded_video, video_length, [], [], info
-        else:
-            padded_label = []
-            for lab in label:
-                padded_label.extend(lab)
-            padded_label = torch.LongTensor(padded_label)
-            return padded_video, video_length, padded_label, label_length, info
-
     def __len__(self):
         return len(self.inputs_list) - 1
 
