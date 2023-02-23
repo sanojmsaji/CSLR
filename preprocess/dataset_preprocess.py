@@ -13,7 +13,7 @@ from multiprocessing import Pool
 
 def csv2dict(anno_path, dataset_type):
     inputs_list = pandas.read_csv(anno_path)
-    inputs_list = (inputs_list.to_dict()['id|folder|signer|annotation'].values())
+    inputs_list = (inputs_list.to_dict()['id|folder|signer|annotation'].values())     //first converting into dict and extracting its values
     info_dict = dict()
     info_dict['prefix'] = anno_path.rsplit("/", 3)[0] + "/features/fullFrame-210x260px"
     print(f"Generate information dict from {anno_path}")
